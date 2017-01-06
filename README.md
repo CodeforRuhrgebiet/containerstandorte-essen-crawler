@@ -4,7 +4,7 @@ This script is a web scraper, getting the location of refuse containers in Essen
 
 ## Installation
 
-* install docker
+* [install docker](https://docs.docker.com/engine/installation/)
 
 ## Usage
 
