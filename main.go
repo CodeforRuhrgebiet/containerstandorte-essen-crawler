@@ -90,7 +90,7 @@ func main() {
 	if err != nil {
 		panic("Error: Could not convert map to JSON data")
 	}
-	ioutil.WriteFile("data.json", json, 0644)
+	ioutil.WriteFile("./build/data.json", json, 0644)
 
 	timeNeeded := time.Now().Sub(timeStart)
 
