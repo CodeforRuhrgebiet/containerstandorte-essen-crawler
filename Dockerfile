@@ -4,8 +4,10 @@ MAINTAINER Martin Schurig <martin@schurig.pw>
 RUN mkdir /usr/app
 WORKDIR /usr/app
 
-RUN go get github.com/kellydunn/golang-geo
+RUN go get github.com/nicostuhlfauth/geoosm
 RUN go get github.com/yhat/scrape
+RUN go get golang.org/x/net/html
+RUN go get golang.org/x/net/html/atom
 
 ADD . /usr/app
 

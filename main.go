@@ -16,20 +16,26 @@ import (
 
 	"strconv"
 
-	"github.com/kellydunn/golang-geo"
+	"github.com/nicostuhlfauth/geoosm"
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
+// Point Contains lat and lon
+type Point struct {
+	Latitude  string `json:"lat"`
+	Longitude string `json:"lon"`
+}
+
 // Standort Stores information about location of refuse container
 type Standort struct {
-	Coordinates *geo.Point `json:"coordinates"`
-	Stadtteil   string     `json:"stadtteil"`
-	Strasse     string     `json:"strasse"`
-	Papier      bool       `json:"papier"`
-	Altkleider  bool       `json:"altkleider"`
-	Glas        bool       `json:"glas"`
+	Coordinates Point  `json:"coordinates"`
+	Stadtteil   string `json:"stadtteil"`
+	Strasse     string `json:"strasse"`
+	Papier      bool   `json:"papier"`
+	Altkleider  bool   `json:"altkleider"`
+	Glas        bool   `json:"glas"`
 }
 
 func main() {
@@ -51,10 +57,6 @@ func main() {
 	mapID := 0
 	currentStadtteil := ""
 
-	//geo.SetGoogleAPIKey("insert your key here")
-
-	geocoder := new(geo.GoogleGeocoder)
-
 	for i := range scrapingResult {
 		if i > 4 {
 			if !(strings.Contains(scrape.Text(scrapingResult[i]), ",")) {
@@ -73,14 +75,20 @@ func main() {
 				}
 				tempSplit := strings.SplitN(scrape.Text(scrapingResult[i]), ",", 2)
 				temp.Strasse = tempSplit[0]
-				address := temp.Strasse + ", Essen, Germany"
-				temp.Coordinates, err = geocoder.Geocode(address)
+				address := temp.Strasse + ",+Essen,+Germany"
+				address = strings.Replace(address, " ", "+", -1)
+
+				osmdata, err := geoosm.NewOSMData().GetJSON(address)
 				if err != nil {
-					log.Println(err)
+					log.Fatal(err)
 				}
-				log.Println(temp.Coordinates)
+
+				if len(osmdata) != 0 {
+					temp.Coordinates.Latitude = osmdata[0].Lat
+					temp.Coordinates.Longitude = osmdata[0].Lon
+				}
+
 				standorte[strconv.Itoa(mapID)] = temp
-				log.Println("Standort hinzugefügt")
 				mapID++
 			}
 		}
